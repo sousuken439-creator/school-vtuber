@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Vtuber AI</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script type="module">
+
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
+
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/loaders/GLTFLoader.js';
+
+import { VRM, VRMLoaderPlugin }
+from 'https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@2.0.7/lib/three-vrm.module.js';
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+  35,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+
+camera.position.set(0, 1.4, 3);
+
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById('canvas'),
+  alpha: true
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(1, 1, 1);
+scene.add(light);
+
+const loader = new GLTFLoader();
+
+loader.register((parser) => {
+  return new VRMLoaderPlugin(parser);
+});
+
+loader.load(
+  './model/yourmodel.vrm',
+
+  (gltf) => {
+
+    const vrm = gltf.userData.vrm;
+
+    scene.add(vrm.scene);
+
+    animate();
+
+  },
+
+  (progress) => {
+    console.log(progress);
+  },
+
+  (error) => {
+    console.error(error);
+  }
+);
+
+function animate() {
+
+  requestAnimationFrame(animate);
+
+  renderer.render(scene, camera);
+
+}
+
+</script>
+
+</body>
+</html>
 
